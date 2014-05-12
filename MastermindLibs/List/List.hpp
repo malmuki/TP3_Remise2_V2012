@@ -88,7 +88,7 @@ void List<TYPE>::Erase(Iterator<TYPE>& _Iter)
         _Iter.GetCurrent()->Next->Previous = _Iter.GetCurrent()->Previous;
         _Iter.GetCurrent()->Previous->Next = _Iter.GetCurrent()->Next;
 
-        _Iter.Next();
+        _Iter.Previous();
         delete  cell;
         nbElements --;
         }
