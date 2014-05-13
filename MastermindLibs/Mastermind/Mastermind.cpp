@@ -51,7 +51,7 @@ ArrayI<Color>* Mastermind::GetElement() const
 	Iterator<ArrayI<Color>> iter;
 	iter.SetCurrent(list->Begin());
 
-	for(int i=0; i<index.GetNumber(GetNbElements()); i++)
+	for(int i=1; i<index.GetNumber(GetNbElements()); i++)
 	{
 		iter.Next();
 	}
@@ -63,19 +63,26 @@ short Mastermind::CleanList(Color* _tabColorRef, short* _tabVerdicts) //return l
 	Iterator<ArrayI<Color>> iter;
 	iter.SetCurrent(list->Begin());
 	bool toDelete;
-	for(int i=0; i<GetNbElements(); i++)
-	{
+	bool deleted;
+	bool toBeDeleted;
+	short deletedElements = 0;
 
+	while(iter.GetCurrent() != NULL)
+	{
+		deleted = false;
 		for(int j = 0; j<4; j++)
 		{
-			switch(_tabVerdicts[j]){
+			switch(_tabVerdicts[j])
+			{
 
 			case 1: //Bonne couleur, bonne place
 
 				//Si la séquence de couleurs traitée n'a pas la couleur à la bonne place, il faut la retirer de la liste
-				if(iter.GetCurrent()->Element->GetElement(j) != _tabColorRef[j])
+				if(iter.GetCurrentElement()->GetElement(j) != _tabColorRef[j])
 				{
 					list->Erase(iter);
+					deleted = true;
+					deletedElements ++;
 				}
 				break;
 
@@ -84,16 +91,24 @@ short Mastermind::CleanList(Color* _tabColorRef, short* _tabVerdicts) //return l
 				//Si la séquence de couleurs traitée n'a pas la couleur à un autre emplacement que celui de la couleur de référence,
 				//il faut la retirer de la liste.
 				toDelete = true;
+				toBeDeleted = false;
 				for(int k=0; k<4; k++)
 				{
-					if(iter.GetCurrent()->Element->GetElement(k) == _tabColorRef[j])
+					if(iter.GetCurrentElement()->GetElement(k) == _tabColorRef[j] && k != j && !toBeDeleted)
 					{
 						toDelete = false;
+					}
+					else if(iter.GetCurrentElement()->GetElement(k) == _tabColorRef[j] && k == j)
+					{
+						toDelete = true;
+						toBeDeleted = true;
 					}
 				}
 				if(toDelete)
 				{
 					list->Erase(iter);
+					deleted = true;
+					deletedElements ++;
 				}
 				break;
 			case 3: //Mauvaise couleur
@@ -101,7 +116,7 @@ short Mastermind::CleanList(Color* _tabColorRef, short* _tabVerdicts) //return l
 				toDelete = false;
 				for(int k=0; k<4; k++)
 				{
-					if(iter.GetCurrent()->Element->GetElement(k) == _tabColorRef[j])
+					if(iter.GetCurrentElement()->GetElement(k) == _tabColorRef[j])
 					{
 						toDelete = true;
 					}
@@ -109,11 +124,18 @@ short Mastermind::CleanList(Color* _tabColorRef, short* _tabVerdicts) //return l
 				if(toDelete)
 				{
 					list->Erase(iter);
+					deleted = true;
+					deletedElements ++;
 				}
 				break;
 			}
+
 		}
-		iter.Next();
+		if(!deleted)
+		{
+			iter.Next();
+		}
+
 	}
-	return 1; //Pour Compiler
+	return deletedElements;
 }
